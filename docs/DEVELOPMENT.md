@@ -1,225 +1,231 @@
-# 开发文档
+# Development Guide / 开发指南
 
-## 项目结构
+This guide is for contributors who want to help improve ccconfig.
+这份指南是给想帮助改进 ccconfig 的贡献者的。
 
-```
-ccconfig/
-├── cmd/                     # CLI 命令定义
-│   ├── root.go             # 根命令
-│   ├── backup.go           # backup 命令
-│   ├── restore.go          # restore 命令
-│   ├── cache.go            # cache 命令
-│   └── init.go             # init 命令
-├── pkg/                     # 核心功能包
-│   ├── backup/             # 备份逻辑
-│   │   ├── settings.go     # settings 处理
-│   │   ├── commands.go     # 命令备份
-│   │   ├── skills.go       # 技能备份
-│   │   └── projects.go     # 项目备份
-│   ├── restore/            # 恢复逻辑
-│   │   ├── settings.go
-│   │   └── files.go
-│   ├── cache/              # 缓存管理
-│   │   └── cache.go
-│   ├── config/             # 配置管理
-│   │   └── config.go
-│   ├── git/                # Git 操作
-│   │   └── git.go
-│   ├── i18n/               # 国际化
-│   │   ├── i18n.go
-│   │   ├── en.yaml
-│   │   └── zh.yaml
-│   └── ui/                 # 用户界面
-│       └── colors.go
-├── .github/workflows/      # GitHub Actions
-│   ├── build.yml           # 构建和测试
-│   ├── auto-restore.yml    # 自动恢复
-│   └── pr-comment.yml      # PR 评论
-├── go.mod
-├── go.sum
-├── main.go
-├── Makefile
-└── README.md
-```
+---
 
-## 开发环境
+## Getting Started / 快速开始
 
-### 要求
+### Prerequisites / 前置要求
 
-- Go 1.21+
-- Git
+- Go 1.21+ installed / 已安装 Go 1.21+
+- Git installed / 已安装 Git
+- Basic knowledge of Go / 基础 Go 知识
 
-### 设置
+### Setup / 设置
 
 ```bash
-# 克隆仓库
+# Clone the repository / 克隆仓库
 git clone https://github.com/jiangtao/cc-config.git
 cd ccconfig
 
-# 安装依赖
+# Download dependencies / 下载依赖
 go mod download
 
-# 构建
+# Build / 构建
 make build
 
-# 安装到 GOPATH/bin
+# Install to your system / 安装到系统
 make install
 ```
 
-## 代码风格
+---
 
-### 遵循 Go 惯例
+## Project Structure / 项目结构
 
-- 使用 `gofmt` 格式化代码
-- 使用 `golint` 检查代码
-- 使用 `go vet` 检查错误
+```
+ccconfig/
+├── cmd/              # CLI commands / CLI 命令
+│   ├── backup.go     # backup command
+│   ├── restore.go    # restore command
+│   ├── cache.go      # cache command
+│   └── init.go       # init command
+├── pkg/              # Core packages / 核心包
+│   ├── backup/       # Backup logic / 备份逻辑
+│   ├── restore/      # Restore logic / 恢复逻辑
+│   ├── config/       # Configuration / 配置
+│   ├── git/          # Git operations / Git 操作
+│   ├── i18n/         # Translations / 翻译
+│   └── ui/           # Colors & output / 颜色和输出
+├── web/              # Landing page / 着陆页
+└── install.sh        # Installation script / 安装脚本
+```
 
-### 添加新命令
+---
 
-1. 在 `cmd/` 创建新文件
-2. 实现命令逻辑
-3. 在 `cmd/root.go` 注册命令
+## Development Workflow / 开发流程
+
+### Make Changes / 修改代码
+
+```bash
+# Edit code / 编辑代码
+vim cmd/backup.go
+
+# Run locally / 本地运行
+go run . backup --repo ~/test-config
+
+# Format code / 格式化代码
+make fmt
+
+# Run linter / 运行检查
+make lint
+
+# Run tests / 运行测试
+make test
+```
+
+### Common Commands / 常用命令
+
+| Command / 命令 | Description / 说明 |
+|----------------|-------------------|
+| `make build` | Build the binary / 构建二进制文件 |
+| `make install` | Install to system / 安装到系统 |
+| `make test` | Run all tests / 运行所有测试 |
+| `make fmt` | Format code / 格式化代码 |
+| `make lint` | Run linter / 运行代码检查 |
+| `make tidy` | Clean up dependencies / 清理依赖 |
+
+---
+
+## Adding Features / 添加功能
+
+### Add a New Command / 添加新命令
 
 ```go
-var newCmd = &cobra.Command{
-    Use:   "new",
-    Short: "New command description",
-    RunE:  runNew,
+// cmd/mycommand.go
+package cmd
+
+var myCmd = &cobra.Command{
+    Use:   "mycommand",
+    Short: "Description of my command",
+    RunE:  runMyCommand,
 }
 
 func init() {
-    GetRootCommand().AddCommand(newCmd)
+    GetRootCommand().AddCommand(myCmd)
 }
 
-func runNew(cmd *cobra.Command, args []string) error {
-    // 实现逻辑
+func runMyCommand(cmd *cobra.Command, args []string) error {
+    // Your code here / 你的代码在这里
     return nil
 }
 ```
 
-### 添加新功能包
+### Add a New Language / 添加新语言
 
-1. 在 `pkg/` 创建新目录
-2. 实现功能
-3. 在命令中使用
+1. Create `pkg/i18n/{lang}.yaml` / 创建语言文件
+2. Add translations / 添加翻译
 
-## 测试
-
-### 运行测试
-
-```bash
-# 运行所有测试
-make test
-
-# 运行特定包测试
-go test ./pkg/backup
-
-# 运行带覆盖率的测试
-go test -cover ./...
+```yaml
+# pkg/i18n/fr.yaml
+my_message:
+  title: "Mon Titre"
+  description: "Ma Description"
 ```
 
-### 编写测试
+3. Use in code / 在代码中使用：
 
 ```go
-func TestFunctionName(t *testing.T) {
-    // Arrange
+i18n.T("my_message.title", nil)
+```
+
+---
+
+## Testing / 测试
+
+### Write Tests / 编写测试
+
+```go
+func TestMyFunction(t *testing.T) {
     input := "test"
+    expected := "expected output"
 
-    // Act
-    result := FunctionName(input)
+    result := MyFunction(input)
 
-    // Assert
     if result != expected {
         t.Errorf("expected %v, got %v", expected, result)
     }
 }
 ```
 
-## 国际化 (i18n)
-
-### 添加新翻译
-
-1. 在 `pkg/i18n/en.yaml` 添加英文翻译
-2. 在 `pkg/i18n/zh.yaml` 添加中文翻译
-
-```yaml
-# en.yaml
-new_feature:
-  title: "New Feature"
-  description: "Feature description"
-
-# zh.yaml
-new_feature:
-  title: "新功能"
-  description: "功能描述"
-```
-
-### 使用翻译
-
-```go
-i18n.T("new_feature.title", nil)
-i18n.T("new_feature.description", map[string]interface{}{
-    "Param": value,
-})
-```
-
-## 发布流程
-
-### 1. 更新版本
+### Run Tests / 运行测试
 
 ```bash
-# 创建 tag
-git tag -a v1.0.0 -m "Release v1.0.0"
+# Run all tests / 运行所有测试
+make test
+
+# Run specific package / 运行特定包
+go test ./pkg/backup -v
+
+# Run with coverage / 运行并查看覆盖率
+go test -cover ./...
+```
+
+---
+
+## Releasing / 发布
+
+### Create a Release / 创建发布
+
+```bash
+# Create a tag / 创建标签
+git tag v1.0.0 -m "Release v1.0.0"
+
+# Push the tag / 推送标签
 git push origin v1.0.0
 ```
 
-### 2. GitHub Actions 自动
+GitHub Actions will automatically:
+GitHub Actions 会自动：
+- Run tests / 运行测试
+- Build binaries for all platforms / 构建所有平台的二进制文件
+- Create a GitHub Release / 创建 GitHub Release
 
-- 运行测试
-- 构建多平台二进制
-- 创建 GitHub Release
+---
 
-### 3. 验证
+## Contributing / 贡献
 
-下载 Release 中的二进制文件并测试。
+We welcome contributions! / 欢迎贡献！
 
-## 调试
+1. Fork the repository / Fork 仓库
+2. Create a branch / 创建分支
+   ```bash
+   git checkout -b feature/my-feature
+   ```
+3. Commit your changes / 提交更改
+   ```bash
+   git commit -m "Add my feature"
+   ```
+4. Push to your fork / 推送到你的 fork
+   ```bash
+   git push origin feature/my-feature
+   ```
+5. Create a Pull Request / 创建 Pull Request
 
-### 启用详细日志
+---
+
+## Tips / 小贴士
+
+### Code Style / 代码风格
+
+- Use `gofmt` to format code / 使用 `gofmt` 格式化代码
+- Follow Go conventions / 遵循 Go 约定
+- Add comments for exported functions / 为导出函数添加注释
+
+### Debugging / 调试
 
 ```bash
-# 使用 -v 标志
-go run . -v backup
+# Run with verbose output / 详细输出运行
+go run . backup --repo ~/test-config --verbose
+
+# Use Delve debugger / 使用 Delve 调试器
+dlv debug ./... -- backup
 ```
 
-### 调试测试
+---
 
-```bash
-# 使用 -v 查看详细输出
-go test -v ./pkg/backup
+## Need Help? / 需要帮助?
 
-# 使用 dlv 调试
-dlv test ./pkg/backup
-```
-
-## 贡献
-
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 创建 Pull Request
-
-## 常见问题
-
-### Q: 如何添加新的配置选项？
-
-A: 在 `pkg/config/config.go` 的 `Config` 结构体添加字段，然后使用 viper 绑定。
-
-### Q: 如何处理敏感信息？
-
-A: 在备份时使用 `jq` 或 `encoding/json` 移除敏感字段，不将其纳入版本控制。
-
-### Q: 如何支持新平台？
-
-A: 在 `Makefile` 的 `PLATFORMS` 变量添加新平台，在 GitHub Actions 中添加对应的构建配置。
+- Create an issue / 创建 issue: [https://github.com/jiangtao/cc-config/issues](https://github.com/jiangtao/cc-config/issues)
+- Check existing issues / 检查现有 issues: [https://github.com/jiangtao/cc-config/issues](https://github.com/jiangtao/cc-config/issues)

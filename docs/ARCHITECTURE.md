@@ -1,217 +1,96 @@
-# 架构设计
+# Architecture / 架构设计
 
-## 概述
+## Overview / 概述
 
-ccconfig 采用模块化设计，将不同功能分离到独立的包中。
+ccconfig uses a simple three-layer architecture:
+ccconfig 使用简单的三层架构：
 
-## 核心组件
+1. **CLI Layer** (`cmd/`) - Command-line interface / 命令行界面
+2. **Business Layer** (`pkg/backup/`, `pkg/restore/`) - Core logic / 核心逻辑
+3. **Support Layer** (`pkg/config`, `pkg/git`, `pkg/i18n`, `pkg/ui`) - Utilities / 工具函数
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                         CLI Layer                        │
-│  (cmd/)                                                 │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐      │
-│  │ backup  │ │ restore │ │  cache  │ │  init   │      │
-│  └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘      │
-│       │           │           │           │             │
-└───────┼───────────┼───────────┼───────────┼─────────────┘
-        │           │           │           │
-        ▼           ▼           ▼           ▼
+│  User commands: backup, restore, cache, init             │
+│  用户命令：backup, restore, cache, init                  │
+└─────────────────────────────────────────────────────────┘
+                            │
+                            ▼
 ┌─────────────────────────────────────────────────────────┐
 │                      Business Layer                      │
-│  (pkg/)                                                 │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐      │
-│  │ backup/ │ │ restore/│ │ cache/  │ │  git/   │      │
-│  └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘      │
-│       │           │           │           │             │
-└───────┼───────────┼───────────┼───────────┼─────────────┘
-        │           │           │           │
-        ▼           ▼           ▼           ▼
+│  Backup and restore logic for settings, commands, etc.   │
+│  设置、命令等备份和恢复逻辑                               │
+└─────────────────────────────────────────────────────────┘
+                            │
+                            ▼
 ┌─────────────────────────────────────────────────────────┐
 │                      Support Layer                       │
-│  (pkg/)                                                 │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐      │
-│  │ config/ │ │  i18n/  │ │   ui/   │ │         │      │
-│  └─────────┘ └─────────┘ └─────────┘ │         │      │
-│                                         │         │      │
-└─────────────────────────────────────────┴─────────┘
+│  Config, Git, i18n, UI helpers                          │
+│  配置、Git、国际化、界面辅助                               │
+└─────────────────────────────────────────────────────────┘
 ```
 
-## 包职责
+## Key Packages / 核心包
 
-### cmd/ - CLI 命令层
+| Package / 包 | Purpose / 用途 |
+|--------------|----------------|
+| `pkg/backup/` | Backup settings, commands, skills, projects <br> 备份设置、命令、技能、项目 |
+| `pkg/restore/` | Restore from backup <br> 从备份恢复 |
+| `pkg/config/` | Load and merge config from flags + files <br> 从标志和文件加载配置 |
+| `pkg/git/` | Git operations (init, add, commit, push) <br> Git 操作 |
+| `pkg/i18n/` | Multi-language support (English/中文) <br> 多语言支持 |
 
-负责：
-- 解析命令行参数
-- 调用业务逻辑
-- 处理用户交互
+## How It Works / 工作原理
 
-### pkg/backup/ - 备份业务逻辑
-
-负责：
-- Settings 备份（移除敏感信息）
-- Commands 备份
-- Skills 备份
-- Projects 扫描和备份
-
-### pkg/restore/ - 恢复业务逻辑
-
-负责：
-- Settings 恢复（合并 API Token）
-- Commands 恢复
-- Skills 恢复
-
-### pkg/cache/ - 缓存管理
-
-负责：
-- 插件缓存打包（tar.gz）
-- 缓存解压
-- 缓存清理
-
-### pkg/config/ - 配置管理
-
-负责：
-- 配置文件解析
-- 环境变量处理
-- 路径展开
-
-### pkg/git/ - Git 操作
-
-负责：
-- Git 仓库初始化
-- Add/Commit/Push 操作
-- 状态检查
-
-### pkg/i18n/ - 国际化
-
-负责：
-- 翻译文件加载
-- 语言检测
-- 文本本地化
-
-### pkg/ui/ - 用户界面
-
-负责：
-- 彩色输出
-- 消息格式化
-
-## 数据流
-
-### Backup 流程
+### Backup Flow / 备份流程
 
 ```
-User Input (CLI Flags)
-         │
-         ▼
-┌─────────────────┐
-│ Config Merge    │
-│ (flag + file)   │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Validate Paths  │
-└────────┬────────┘
-         │
-    ┌────┴────┐
-    ▼         ▼
-┌────────┐ ┌────────┐
-│ Backup │ │ Backup │
-│Settings│ │Commands│
-└────┬───┘ └────┬───┘
-     │          │
-     └────┬─────┘
-          ▼
-    ┌────────┐
-    │ Backup │
-    │ Skills │
-    └────┬───┘
-         │
-         ▼
-    ┌────────┐
-    │ Backup │
-    │Projects│
-    └────┬───┘
-         │
-         ▼
-    ┌────────┐
-    │Git Add │
-    │&Commit │
-    └────┬───┘
-         │
-         ▼
-   ┌──────────┐
-   │ Output   │
-   └──────────┘
+User runs: ccconfig backup
+    │
+    ▼
+Load config (flags + ~/.ccconfig.yaml)
+    │
+    ▼
+Backup settings → commands → skills → projects
+    │
+    ▼
+Git add + commit (optional: push)
+    │
+    ▼
+Done! ✅
 ```
 
-### Restore 流程
+### Restore Flow / 恢复流程
 
 ```
-User Input (CLI Flags)
-         │
-         ▼
-┌─────────────────┐
-│ Config Merge    │
-│ (flag + file)   │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Git Pull        │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Create Dirs     │
-└────────┬────────┘
-         │
-    ┌────┴────┐
-    ▼         ▼
-┌────────┐ ┌────────┐
-│Restore │ │Restore │
-│Settings│ │Commands│
-└────┬───┘ └────┬───┘
-     │          │
-     └────┬─────┘
-          ▼
-    ┌────────┐
-    │Restore │
-    │ Skills │
-    └────┬───┘
-         │
-         ▼
-   ┌──────────┐
-   │ Output   │
-   └──────────┘
+User runs: ccconfig restore
+    │
+    ▼
+Git pull (get latest configs)
+    │
+    ▼
+Restore settings → commands → skills → projects
+    │
+    ▼
+Prompt for API token (if needed)
+    │
+    ▼
+Done! ✅
 ```
 
-## 错误处理策略
+## For Developers / 开发者说明
 
-| 错误类型 | 处理方式 | 示例 |
-|---------|---------|------|
-| 源文件不存在 | 警告，继续 | settings.json 缺失 |
-| 目标无权限 | 错误，退出 | ~/.claude 不可写 |
-| Git 失败 | 警告，继续 | git commit 失败 |
-| JSON 解析失败 | 错误，退出 | settings.json 损坏 |
-| Token 无效 | 警告，提示重输 | API Token 格式错误 |
+### Add a new command / 添加新命令
 
-## 扩展点
+1. Create file in `cmd/` / 在 `cmd/` 中创建文件
+2. Use Cobra library / 使用 Cobra 库
+3. Register in `init()` / 在 `init()` 中注册
 
-### 添加新的备份类型
+### Add a new language / 添加新语言
 
-1. 在 `pkg/backup/` 创建新文件
-2. 实现 Backup 接口
-3. 在 `cmd/backup.go` 中调用
+1. Create `pkg/i18n/{lang}.yaml` / 创建语言文件
+2. Add translations / 添加翻译
 
-### 添加新的语言
-
-1. 在 `pkg/i18n/` 创建新的 YAML 文件
-2. 添加翻译内容
-3. 在 `i18n.go` 中注册语言
-
-### 添加新的命令
-
-1. 在 `cmd/` 创建新文件
-2. 实现 cobra.Command
-3. 在 `init()` 中注册
+For more details, see [DEVELOPMENT.md](DEVELOPMENT.md).
+更多详情请参阅 [DEVELOPMENT.md](DEVELOPMENT.md)。

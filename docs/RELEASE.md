@@ -1,81 +1,95 @@
-# 发布指南
+# Release Guide / 发布指南
 
-## 版本号规则
+This guide explains how to create a new release of ccconfig.
+这份指南说明如何创建新的 ccconfig 发布版本。
 
-遵循语义化版本 (Semantic Versioning): `MAJOR.MINOR.PATCH`
+---
 
-- **MAJOR**: 不兼容的 API 变更
-- **MINOR**: 向后兼容的功能新增
-- **PATCH**: 向后兼容的问题修复
+## Version Numbers / 版本号
 
-示例：
-- `v1.0.0` - 首个稳定版本
-- `v1.1.0` - 新增功能
-- `v1.1.1` - Bug 修复
-- `v2.0.0` - 重大变更
+We use Semantic Versioning: `MAJOR.MINOR.PATCH`
+我们使用语义化版本：`MAJOR.MINOR.PATCH`
 
-## 发布步骤
+- **MAJOR**: Breaking changes / 重大变更
+- **MINOR**: New features / 新功能
+- **PATCH**: Bug fixes / Bug 修复
 
-### 1. 更新版本
+Examples / 示例：
+- `v1.0.0` - First stable release / 首个稳定版本
+- `v1.1.0` - New feature added / 添加新功能
+- `v1.1.1` - Bug fix / Bug 修复
+- `v2.0.0` - Major changes / 重大变更
+
+---
+
+## How to Release / 如何发布
+
+### Step 1: Prepare / 准备
 
 ```bash
-# 更新 go.mod 中的版本（如果有）
-# 更新文档中的版本引用
+# Make sure all tests pass / 确保所有测试通过
+make test
 
-# 创建并推送 tag
-git tag -a v1.0.0 -m "Release v1.0.0
+# Update CHANGELOG.md if needed / 如需要，更新 CHANGELOG.md
+```
 
-- Initial stable release
-- Support backup/restore commands
-- i18n support (en/zh)
-- Cross-platform builds"
+### Step 2: Create Tag / 创建标签
+
+```bash
+# Create and push tag / 创建并推送标签
+git tag -a v1.0.0 -m "Release v1.0.0"
 git push origin v1.0.0
 ```
 
-### 2. GitHub Actions 自动构建
+### Step 3: Wait for GitHub Actions / 等待 GitHub Actions
 
-推送 tag 后，GitHub Actions 会：
-1. 运行测试
-2. 构建多平台二进制
-3. 创建 GitHub Release
-4. 上传构建产物
+After pushing the tag, GitHub Actions will automatically:
+推送标签后，GitHub Actions 会自动：
 
-### 3. 验证 Release
+1. ✅ Run tests / 运行测试
+2. 🔨 Build binaries for all platforms / 为所有平台构建二进制文件
+3. 📦 Create GitHub Release / 创建 GitHub Release
+4. 📤 Upload build artifacts / 上传构建产物
 
-1. 访问 GitHub Releases 页面
-2. 下载各平台二进制
-3. 测试基本功能
+This takes about 5-10 minutes.
+这大约需要 5-10 分钟。
 
-### 4. 发布公告
+---
 
-创建 Release Notes，包含：
-- 变更内容
-- 升级指南（如有）
-- 已知问题
+## Release Checklist / 发布检查清单
 
-## 发布检查清单
+Before releasing / 发布前：
 
-- [ ] 所有测试通过
-- [ ] 更新 CHANGELOG
-- [ ] 更新文档中的版本引用
-- [ ] 跨平台构建测试
-- [ ] 创建 tag
-- [ ] 推送 tag
-- [ ] 验证 GitHub Release
-- [ ] 发布公告
+- [ ] All tests pass / 所有测试通过
+- [ ] CHANGELOG.md updated / CHANGELOG.md 已更新
+- [ ] Documentation updated / 文档已更新
+- [ ] Tested on macOS and Linux / 在 macOS 和 Linux 上测试
 
-## 回滚计划
+After releasing / 发布后：
 
-如果发布后发现严重问题：
+- [ ] Verify GitHub Release created / 验证 GitHub Release 已创建
+- [ ] Download and test binaries / 下载并测试二进制文件
+- [ ] Update install.sh if needed / 如需要，更新 install.sh
+
+---
+
+## Hotfix / 紧急修复
+
+If you find a critical bug after release:
+如果在发布后发现严重 bug：
 
 ```bash
-# 删除远程 tag
-git push origin :refs/tags/v1.0.0
+# Fix the bug / 修复 bug
+git commit -am "Hotfix: critical bug fix"
 
-# 删除本地 tag
-git tag -d v1.0.0
-
-# 创建修复版本
-git tag -a v1.0.1 -m "Hotfix: ..."
-git push origin v1.0.1
+# Create new patch version / 创建新的补丁版本
+git tag -a v1.0.1 -m "Hotfix: critical bug fix"
+git push origin main v1.0.1
 ```
+
+---
+
+## Need Help? / 需要帮助?
+
+- Check [GitHub Actions](https://github.com/jiangtao/cc-config/actions)
+- Create an [issue](https://github.com/jiangtao/cc-config/issues)
