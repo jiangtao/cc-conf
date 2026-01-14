@@ -48,24 +48,27 @@ jobs:
           echo "Working directory:"
           pwd
           echo "Go files:"
-          find . -name "*.go" -type f | head -20
+          find . -name "*.go" -type f
           echo "Go mod:"
           cat go.mod
           echo "Directory structure:"
           ls -la
           echo "Pkg directory:"
           ls -la pkg/ || echo "No pkg directory"
+          echo "Go list all:"
+          go list ./...
 
       - name: Manually run golangci-lint
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.62.0
-          $(go env GOPATH)/bin/golangci-lint run --config .golangci.yml --verbose
+          echo "Running golangci-lint with explicit paths..."
+          $(go env GOPATH)/bin/golangci-lint run --config .golangci.yml --verbose ./pkg/... ./cmd/...
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.62.0
-          args: run --config .golangci.yml --verbose
+          args: run --config .golangci.yml ./pkg/... ./cmd/...
 
   build:
     name: Build
