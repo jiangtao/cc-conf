@@ -3,8 +3,20 @@
 > Claude Code configuration backup/restore tool - Sync your settings, commands, skills, and project configs across machines.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Report Card](https://goreportcard.com/badge/github.com/jiangtao/ccconfig)](https://goreportcard.com/report/github.com/jiangtao/ccconfig)
+[![Go Report Card](https://goreportcard.com/badge/github.com/jiangtao/cc-config)](https://goreportcard.com/report/github.com/jiangtao/cc-config)
 <!-- [![Live Site](https://img.shields.io/badge/🔗-Live_Site-blue)](https://ccconfig.vercel.app) -->
+
+## Quick Install
+
+**One-line install (macOS/Linux):**
+```bash
+curl -fsSL https://get.ccconfig.dev | bash
+```
+
+Or:
+```bash
+curl -fsSL https://cc-config.vercel.app/install.sh | bash
+```
 
 ## Why ccconfig?
 
@@ -35,17 +47,17 @@ When you use Claude Code across multiple computers, keeping your configurations 
 
 ```bash
 # macOS (Apple Silicon)
-curl -L https://github.com/jiangtao/ccconfig/releases/latest/download/ccconfig-darwin-arm64 -o ccconfig
+curl -L https://github.com/jiangtao/cc-config/releases/latest/download/ccconfig-darwin-arm64 -o ccconfig
 chmod +x ccconfig
 sudo mv ccconfig /usr/local/bin/
 
 # macOS (Intel)
-curl -L https://github.com/jiangtao/ccconfig/releases/latest/download/ccconfig-darwin-amd64 -o ccconfig
+curl -L https://github.com/jiangtao/cc-config/releases/latest/download/ccconfig-darwin-amd64 -o ccconfig
 chmod +x ccconfig
 sudo mv ccconfig /usr/local/bin/
 
 # Linux
-curl -L https://github.com/jiangtao/ccconfig/releases/latest/download/ccconfig-linux-amd64 -o ccconfig
+curl -L https://github.com/jiangtao/cc-config/releases/latest/download/ccconfig-linux-amd64 -o ccconfig
 chmod +x ccconfig
 sudo mv ccconfig /usr/local/bin/
 ```
@@ -53,7 +65,7 @@ sudo mv ccconfig /usr/local/bin/
 **Option 2: Build from source**
 
 ```bash
-git clone https://github.com/jiangtao/ccconfig.git
+git clone https://github.com/jiangtao/cc-config.git
 cd ccconfig
 make build
 sudo make install
@@ -213,7 +225,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: jiangtao/ccconfig/actions/restore@main
+      - uses: jiangtao/cc-config/actions/restore@main
         with:
           repo: '.'
 ```
@@ -288,5 +300,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## Links
 
 - [Documentation](https://ccconfig.dev)
-- [GitHub](https://github.com/jiangtao/ccconfig)
-- [Releases](https://github.com/jiangtao/ccconfig/releases)
+- [GitHub](https://github.com/jiangtao/cc-config)
+- [Releases](https://github.com/jiangtao/cc-config/releases)

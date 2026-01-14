@@ -26,5 +26,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic sensitive info removal (API Token)
 - Project configuration collection
 
-[Unreleased]: https://github.com/jiangtao/ccconfig/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/jiangtao/ccconfig/releases/tag/v1.0.0
+[Unreleased]: https://github.com/jiangtao/cc-config/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/jiangtao/cc-config/releases/tag/v1.0.0

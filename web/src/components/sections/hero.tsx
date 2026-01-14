@@ -26,7 +26,7 @@ export function Hero() {
           </Button>
           <Button size="lg" variant="outline" asChild>
             <a
-              href="https://github.com/jiangtao/ccconfig"
+              href="https://github.com/jiangtao/cc-config"
               target="_blank"
               rel="noopener noreferrer"
             >

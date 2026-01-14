@@ -23,7 +23,7 @@ npm start
 The landing page is automatically deployed to Vercel on push to main.
 
 - Live: https://ccconfig.vercel.app
-- Vercel Dashboard: https://vercel.com/jiangtao/ccconfig
+- Vercel Dashboard: https://vercel.com/jiangtao/cc-config
 
 ## Tech Stack
 

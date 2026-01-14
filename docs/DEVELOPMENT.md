@@ -53,7 +53,7 @@ ccconfig/
 
 ```bash
 # 克隆仓库
-git clone https://github.com/jiangtao/ccconfig.git
+git clone https://github.com/jiangtao/cc-config.git
 cd ccconfig
 
 # 安装依赖

@@ -8,7 +8,7 @@ export function Footer() {
           <p>© 2024 ccconfig. MIT License.</p>
           <div className="flex items-center gap-6">
             <a
-              href="https://github.com/jiangtao/ccconfig"
+              href="https://github.com/jiangtao/cc-config"
               className="flex items-center gap-2 hover:text-white"
               target="_blank"
               rel="noopener noreferrer"
@@ -17,7 +17,7 @@ export function Footer() {
               GitHub
             </a>
             <a
-              href="https://github.com/jiangtao/ccconfig/blob/main/README.md"
+              href="https://github.com/jiangtao/cc-config/blob/main/README.md"
               className="hover:text-white"
               target="_blank"
               rel="noopener noreferrer"
