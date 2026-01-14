@@ -14,6 +14,10 @@ linters:
     - ineffassign
 
 linters-settings:
+  govet:
+    disable:
+      - printf
+    enable-all: true
   staticcheck:
     checks: ["all", "-ST1006"]
 
