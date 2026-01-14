@@ -13,6 +13,10 @@ linters:
     - gosimple
     - ineffassign
 
+linters-settings:
+  staticcheck:
+    checks: ["all", "-ST1006"]
+
 issues:
   exclude-use-default: false
   max-issues-per-linter: 0

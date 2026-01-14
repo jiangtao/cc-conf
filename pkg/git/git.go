@@ -28,6 +28,13 @@ func Init(dir string) error {
 	return cmd.Run()
 }
 
+// Config sets a git config value
+func Config(dir, key, value string) error {
+	cmd := exec.Command("git", "config", key, value)
+	cmd.Dir = dir
+	return cmd.Run()
+}
+
 // AddRemote adds a remote to the repository
 func AddRemote(dir, name, url string) error {
 	cmd := exec.Command("git", "remote", "add", name, url)

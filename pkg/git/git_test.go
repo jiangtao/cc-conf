@@ -50,6 +50,14 @@ func TestAddCommit(t *testing.T) {
 		t.Fatalf("Init() error = %v", err)
 	}
 
+	// Set git config for commits in test repo
+	if err := Config(tmpDir, "user.name", "Test User"); err != nil {
+		t.Fatalf("Config name error = %v", err)
+	}
+	if err := Config(tmpDir, "user.email", "test@example.com"); err != nil {
+		t.Fatalf("Config email error = %v", err)
+	}
+
 	// Create a test file
 	testFile := filepath.Join(tmpDir, "test.txt")
 	if err := os.WriteFile(testFile, []byte("test"), 0644); err != nil {
