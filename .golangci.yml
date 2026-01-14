@@ -25,7 +25,7 @@ linters-settings:
       - nilfunc
       - printf
       - stdmethods
-      - unreach
+      - unreachable
 
 issues:
   exclude-use-default: false
