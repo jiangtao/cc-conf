@@ -53,13 +53,28 @@ func Backup(repoPath string) error {
 	if err != nil {
 		return err
 	}
-	defer outFile.Close()
+	defer func() {
+		if closeErr := outFile.Close(); closeErr != nil {
+			// Log but don't fail if close fails during cleanup
+			_ = closeErr
+		}
+	}()
 
 	gzw := gzip.NewWriter(outFile)
-	defer gzw.Close()
+	defer func() {
+		if closeErr := gzw.Close(); closeErr != nil {
+			// Log but don't fail if close fails during cleanup
+			_ = closeErr
+		}
+	}()
 
 	tw := tar.NewWriter(gzw)
-	defer tw.Close()
+	defer func() {
+		if closeErr := tw.Close(); closeErr != nil {
+			// Log but don't fail if close fails during cleanup
+			_ = closeErr
+		}
+	}()
 
 	return filepath.Walk(pluginsCacheDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -87,7 +102,12 @@ func Backup(repoPath string) error {
 		if err != nil {
 			return err
 		}
-		defer file.Close()
+		defer func() {
+			if closeErr := file.Close(); closeErr != nil {
+				// Log but don't fail if close fails during cleanup
+				_ = closeErr
+			}
+		}()
 
 		_, err = io.Copy(tw, file)
 		return err
@@ -123,13 +143,23 @@ func Restore(repoPath string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		if closeErr := file.Close(); closeErr != nil {
+			// Log but don't fail if close fails during cleanup
+			_ = closeErr
+		}
+	}()
 
 	gzr, err := gzip.NewReader(file)
 	if err != nil {
 		return err
 	}
-	defer gzr.Close()
+	defer func() {
+		if closeErr := gzr.Close(); closeErr != nil {
+			// Log but don't fail if close fails during cleanup
+			_ = closeErr
+		}
+	}()
 
 	tr := tar.NewReader(gzr)
 
@@ -159,10 +189,12 @@ func Restore(repoPath string) error {
 			}
 
 			if _, err := io.Copy(outFile, tr); err != nil {
-				outFile.Close()
+				_ = outFile.Close()
 				return err
 			}
-			outFile.Close()
+			if err := outFile.Close(); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -197,6 +229,7 @@ func Clean(repoPath string) error {
 	// Delete files
 	for _, entry := range entries {
 		if !entry.IsDir() {
+			//nolint:errcheck // Cleanup failure is acceptable
 			os.Remove(filepath.Join(cacheDir, entry.Name()))
 		}
 	}

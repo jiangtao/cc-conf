@@ -12,7 +12,7 @@ func TestIsGitRepo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(tmpDir)
+	t.Cleanup(func() { _ = os.RemoveAll(tmpDir) })
 
 	// Not a git repo initially
 	isRepo, err := IsGitRepo(tmpDir)
@@ -43,7 +43,7 @@ func TestAddCommit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(tmpDir)
+	t.Cleanup(func() { _ = os.RemoveAll(tmpDir) })
 
 	// Initialize git repo
 	if err := Init(tmpDir); err != nil {

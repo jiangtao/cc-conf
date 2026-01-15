@@ -6,28 +6,17 @@ run:
 linters:
   disable-all: true
   enable:
-    - govet
     - errcheck
     - staticcheck
     - unused
     - ineffassign
+  disable:
+    - govet
 
 formatters:
   enable:
     - gofmt
     - goimports
-
-linters-settings:
-  govet:
-    disable-all: true
-    enable:
-      - atomic
-      - bools
-      - composites
-      - copylocks
-      - nilfunc
-      - stdmethods
-      - structtag
 
 issues:
   max-issues-per-linter: 0

@@ -62,14 +62,14 @@ jobs:
 
       - name: Manually run golangci-lint
         run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin latest
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.7.2
           echo "Running golangci-lint with explicit paths..."
           $(go env GOPATH)/bin/golangci-lint run --config .golangci.yml --verbose ./pkg/... ./cmd/...
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: latest
+          version: v2.1
           args: run --config .golangci.yml ./pkg/... ./cmd/...
 
   build:
