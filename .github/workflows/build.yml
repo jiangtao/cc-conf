@@ -67,9 +67,9 @@ jobs:
           $(go env GOPATH)/bin/golangci-lint run --config .golangci.yml --verbose ./pkg/... ./cmd/...
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
-          version: v2.1
+          version: v2.7.2
           args: run --config .golangci.yml ./pkg/... ./cmd/...
 
   build:
