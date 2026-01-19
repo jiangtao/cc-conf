@@ -1,0 +1,94 @@
+{
+  "common": {
+    "success": "Success",
+    "warning": "Warning",
+    "error": "Error",
+    "skipped": "Skipped"
+  },
+  "backup": {
+    "title": "Claude Code Configuration Backup",
+    "steps": {
+      "settings": "Backing up settings.json (removing sensitive info)",
+      "commands": "Backing up custom commands",
+      "skills": "Backing up custom skills",
+      "projects": "Scanning and backing up project configs",
+      "commit": "Git commit"
+    },
+    "messages": {
+      "settings_removed": "Removed ANTHROPIC_AUTH_TOKEN",
+      "commands_count": "Backed up {{count}} custom commands",
+      "skills_count": "Backed up {{count}} custom skills",
+      "projects_count": "Backed up {{count}} project configs",
+      "no_changes": "No changes to commit",
+      "committed": "Committed to local repository"
+    },
+    "warnings": {
+      "not_found": "{{item}} not found, skipped",
+      "suggest_jq": "Recommend installing jq for better JSON handling"
+    }
+  },
+  "restore": {
+    "title": "Claude Code Configuration Restore",
+    "steps": {
+      "update": "Updating config repository",
+      "create_dirs": "Creating Claude directories",
+      "settings": "Restoring settings.json",
+      "commands": "Restoring custom commands",
+      "skills": "Restoring custom skills",
+      "cache": "Restoring plugin cache"
+    },
+    "messages": {
+      "existing_token": "Existing API Token detected, will keep current key",
+      "need_token": "Anthropic API Token required",
+      "restored": "{{item}} restored",
+      "cache_prompt": "Plugin cache found ({{size}}). Restore it?"
+    },
+    "prompts": {
+      "api_token": "Enter Anthropic API Token (or press Enter to skip):",
+      "restore_cache": "Restore plugin cache? (y/N):"
+    }
+  },
+  "cache": {
+    "backup": {
+      "title": "Plugin Cache Backup",
+      "detected": "Detected plugins:",
+      "packing": "Packing...",
+      "done": "Backup complete",
+      "hint": "To commit to Git: git add cache/ && git commit -m 'update plugins cache'"
+    },
+    "restore": {
+      "title": "Plugin Cache Restore",
+      "info": "Backup file info:",
+      "contents": "Backup contents:",
+      "confirm": "Restore? (y/N):",
+      "backing_up": "Backing up existing cache to: {{path}}",
+      "extracting": "Extracting...",
+      "done": "Restore complete"
+    },
+    "clean": {
+      "title": "Clean Plugin Cache Backup",
+      "files": "Files to clean:",
+      "total": "Total: {{size}} MB",
+      "confirm": "Delete these files? (y/N):",
+      "done": "Clean complete"
+    }
+  },
+  "init": {
+    "title": "Initialize Config Repository",
+    "prompts": {
+      "repo_path": "Repository path:",
+      "git_url": "Git remote URL (optional):",
+      "init_git": "Initialize Git repository? (y/N):"
+    },
+    "messages": {
+      "created": "Repository created",
+      "git_initialized": "Git initialized"
+    }
+  },
+  "errors": {
+    "repo_not_found": "Config repository not found: {{path}}",
+    "no_permissions": "No write permission for: {{path}}",
+    "git_failed": "Git operation failed: {{error}}",
+    "json_failed": "JSON processing failed: {{error}}"
+  }
+}

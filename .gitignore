@@ -19,10 +19,19 @@ Thumbs.db
 *.swo
 *~
 docs/plans
-# 构建产物
+
+# Go 构建产物
 build/
 ccconfig
 ccconfig-*
+
+# Node.js
+node_modules/
+dist/
+*.log
+.pnpm-debug.log*
+*.tgz
+pnpm-lock.yaml
 
 # Web landing page
 web/node_modules/

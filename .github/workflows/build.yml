@@ -2,13 +2,13 @@ name: Build
 
 on:
   push:
-    branches: [ main ]
-    tags: [ 'v*' ]
+    branches: [main]
+    tags: ['v*']
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
-  GO_VERSION: '1.24'
+  NODE_VERSION: '20'
 
 jobs:
   test:
@@ -18,101 +18,91 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          go-version: ${{ env.GO_VERSION }}
+          version: 9
 
-      - name: Download dependencies
-        run: |
-          go mod download
-          go mod tidy
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Type check
+        run: pnpm run typecheck
+
+      - name: Lint
+        run: pnpm run lint
 
       - name: Run tests
-        run: go test -vet=off -v ./...
-
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Debug info
-        run: |
-          echo "Go version:"
-          go version
-          echo "Working directory:"
-          pwd
-          echo "Go files:"
-          find . -name "*.go" -type f
-          echo "Go mod:"
-          cat go.mod
-          echo "Directory structure:"
-          ls -la
-          echo "Pkg directory:"
-          ls -la pkg/ || echo "No pkg directory"
-          echo "Go list all:"
-          go list ./...
-
-      - name: Manually run golangci-lint
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.7.2
-          echo "Running golangci-lint with explicit paths..."
-          $(go env GOPATH)/bin/golangci-lint run --config .golangci.yml --verbose ./pkg/... ./cmd/...
-
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v7
-        with:
-          version: v2.7.2
-          args: run --config .golangci.yml ./pkg/... ./cmd/...
+        run: pnpm test
 
   build:
     name: Build
-    needs: [test, lint]
+    needs: [test]
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - goos: darwin
-            goarch: amd64
-          - goos: darwin
-            goarch: arm64
-          - goos: linux
-            goarch: amd64
-          - goos: linux
-            goarch: arm64
-          - goos: windows
-            goarch: amd64
+          - os: macos-latest
+            arch: x64
+          - os: macos-latest
+            arch: arm64
+          - os: ubuntu-latest
+            arch: x64
+          - os: ubuntu-latest
+            arch: arm64
+          - os: windows-latest
+            arch: x64
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          go-version: ${{ env.GO_VERSION }}
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
 
       - name: Build
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-          CGO_ENABLED: 0
-        run: |
-          VERSION=${{ github.ref_type == 'tag' && github.ref_name || 'dev' }}
-          BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          go build -ldflags "-X main.Version=$VERSION -X main.BuildTime=$BUILD_TIME" -o ccconfig${{ matrix.goos == 'windows' && '.exe' || '' }} .
+        run: pnpm run build
 
-      - name: Upload artifact
+      - name: Package binary (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cp dist/cli.js ccconfig-${{ matrix.os }}-${{ matrix.arch }}
+          chmod +x ccconfig-${{ matrix.os }}-${{ matrix.arch }}
+
+      - name: Package binary (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Copy-Item dist/cli.js ccconfig-${{ matrix.os }}-${{ matrix.arch }}.exe
+
+      - name: Upload artifact (Unix)
+        if: runner.os != 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: ccconfig-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: ccconfig${{ matrix.goos == 'windows' && '.exe' || '' }}
+          name: ccconfig-${{ matrix.os }}-${{ matrix.arch }}
+          path: ccconfig-${{ matrix.os }}-${{ matrix.arch }}
+
+      - name: Upload artifact (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccconfig-${{ matrix.os }}-${{ matrix.arch }}
+          path: ccconfig-${{ matrix.os }}-${{ matrix.arch }}.exe
 
   release:
     name: Release
@@ -134,12 +124,11 @@ jobs:
         run: |
           cd artifacts
           for dir in */; do
-            binary_name=$$(basename $$dir .exe)
-            cd $$dir
+            cd "$$dir"
             if [[ -f ccconfig.exe ]]; then
-              zip ../ccconfig-$${binary_name#ccconfig-}.zip ccconfig.exe
+              zip ../ccconfig-$${dir#ccconfig-}.zip ccconfig.exe
             else
-              tar czf ../ccconfig-$${binary_name#ccconfig-}.tar.gz ccconfig
+              tar czf ../ccconfig-$${dir#ccconfig-}.tar.gz ccconfig
             fi
             cd ..
           done
@@ -156,3 +145,37 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  npm-publish:
+    name: npm publish
+    needs: [test, build]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Publish to npm
+        run: pnpm publish --no-git-checks --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
