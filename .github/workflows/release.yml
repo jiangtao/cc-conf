@@ -58,21 +58,21 @@ jobs:
               exit 1
             fi
             NEW_VERSION="$CUSTOM"
+            # Directly update package.json for custom version
+            npm version "$NEW_VERSION" --no-git-tag-version
           elif [ "$TYPE" = "prerelease" ]; then
             # Bump patch and add prerelease suffix
             NEW_VERSION=$(npm version patch --no-git-tag-version | sed 's/^v//')
             NEW_VERSION="${NEW_VERSION}-rc.$(date +%Y%m%d%H%M%S)"
+            # Update package.json with prerelease version
+            npm version "$NEW_VERSION" --no-git-tag-version
           else
+            # This updates package.json and outputs the new version
             NEW_VERSION=$(npm version $TYPE --no-git-tag-version | sed 's/^v//')
           fi
 
           echo "new=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "New version: $NEW_VERSION"
-
-      - name: Update package.json
-        run: |
-          NEW_VERSION="${{ steps.version.outputs.new }}"
-          npm version "$NEW_VERSION" --no-git-tag-version --git-tag-version false
 
       - name: Commit version change
         run: |
