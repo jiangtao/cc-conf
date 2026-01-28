@@ -68,23 +68,23 @@ jobs:
 
       - name: Package binaries with pkg
         run: |
-          pnpm pkg dist/bundle.cjs -t node18-linux-x64,node18-linux-arm64,node18-macos-x64,node18-macos-arm64,node18-win-x64 --output bin/ccconfig
+          pnpm pkg dist/bundle.cjs -t node18-linux-x64,node18-linux-arm64,node18-macos-x64,node18-macos-arm64,node18-win-x64 --output bin/ccc
 
       - name: Rename binaries for upload
         run: |
           cd bin
-          mv ccconfig-linux-x64 ccconfig-linux-amd64
-          mv ccconfig-linux-arm64 ccconfig-linux-arm64
-          mv ccconfig-macos-x64 ccconfig-darwin-amd64
-          mv ccconfig-macos-arm64 ccconfig-darwin-arm64
-          mv ccconfig-win-x64.exe ccconfig-windows-amd64.exe
+          mv ccc-linux-x64 ccc-linux-amd64
+          mv ccc-linux-arm64 ccc-linux-arm64
+          mv ccc-macos-x64 ccc-darwin-amd64
+          mv ccc-macos-arm64 ccc-darwin-arm64
+          mv ccc-win-x64.exe ccc-windows-amd64.exe
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ccconfig-binaries
+          name: ccc-binaries
           path: |
-            bin/ccconfig-*
+            bin/ccc-*
 
   release:
     name: Release
@@ -100,13 +100,13 @@ jobs:
       - name: Download binaries
         uses: actions/download-artifact@v4
         with:
-          name: ccconfig-binaries
+          name: ccc-binaries
           path: binaries
 
       - name: Create release archives
         run: |
           cd binaries
-          for bin in ccconfig-*; do
+          for bin in ccc-*; do
             if [[ "$bin" == *".exe" ]]; then
               zip "$bin.zip" "$bin"
             else
