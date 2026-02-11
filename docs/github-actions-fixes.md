@@ -23,14 +23,17 @@
   # was: pnpm pkg dist/bundle.cjs -t node18-linux-x64,node18-linux-arm64,node18-macos-x64,node18-macos-arm64,node18-win-x64 --output bin/cc-conf
   ```
 
-### 3. build.yml - YAML Syntax Error
-- **Issue**: The `cache` parameter had incorrect indentation/formatting in the pnpm action setup steps
-- **Location**: `.github/workflows/build.yml:30` and `.github/workflows/build.yml:61`
-- **Fix**: Corrected YAML syntax with proper `cache: 'pnpm'` configuration
-- **Impact**: Node.js setup will now properly cache pnpm dependencies for faster builds
+### 3. build.yml - YAML Indentation Fix
+- **Issue**: The `env:` block had incorrect indentation at the end of the npm-publish job, placing it at job level instead of step level
+- **Location**: `.github/workflows/build.yml:159-162`
+- **Fix**: Corrected `env:` block indentation to be nested under the "Publish to npm" step
+- **Impact**: The `NODE_AUTH_TOKEN` environment variable will now be properly available to the `pnpm publish` command
 - **Code Change**:
   ```yaml
-  cache: 'pnpm'  # Corrected YAML syntax for caching
+  - name: Publish to npm
+    run: pnpm publish --no-git-checks --access public
+    env:  # Was incorrectly at same level as the step dash
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   ```
 
 ## Summary
@@ -39,9 +42,9 @@ All three issues have been resolved in the GitHub Actions workflows:
 
 1. **pr-comment.yml**: Repository name corrected to `jiangtao/cc-conf`
 2. **build.yml**: Changed `pnpm pkg` to `pnpm exec pkg` for proper pkg execution
-3. **build.yml**: Fixed YAML syntax for cache configuration
+3. **build.yml**: Fixed `env:` block indentation in npm-publish job
 
 These fixes ensure that:
 - PR comment workflows can properly checkout the correct repository
 - Binary builds will succeed with the correct pkg command
-- Dependency caching works properly for improved CI/CD performance
+- npm publish will have access to the authentication token
