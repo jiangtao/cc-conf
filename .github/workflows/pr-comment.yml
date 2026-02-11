@@ -15,7 +15,7 @@ jobs:
       - name: Checkout ccconfig
         uses: actions/checkout@v4
         with:
-          repository: jiangtao/cc-config
+          repository: jiangtao/cc-conf
           path: ccconfig
 
       - name: Setup pnpm
