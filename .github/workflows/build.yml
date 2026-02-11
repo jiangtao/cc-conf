@@ -158,5 +158,5 @@ jobs:
 
       - name: Publish to npm
         run: pnpm publish --no-git-checks --access public
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
