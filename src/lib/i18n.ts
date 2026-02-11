@@ -68,12 +68,8 @@ export async function initI18n(forceLang?: string): Promise<i18n> {
 
   // Read JSON files directly
   const localesDir = getLocalesDir();
-  const enTranslations = JSON.parse(
-    readFileSync(resolve(localesDir, 'en.json'), 'utf-8')
-  );
-  const zhTranslations = JSON.parse(
-    readFileSync(resolve(localesDir, 'zh.json'), 'utf-8')
-  );
+  const enTranslations = JSON.parse(readFileSync(resolve(localesDir, 'en.json'), 'utf-8'));
+  const zhTranslations = JSON.parse(readFileSync(resolve(localesDir, 'zh.json'), 'utf-8'));
 
   const options: InitOptions = {
     lng: langCode,

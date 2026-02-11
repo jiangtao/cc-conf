@@ -68,13 +68,7 @@ export function getClaudeDir(): string {
  */
 async function loadConfigFile(): Promise<Partial<Config>> {
   const explorer = cosmiconfig('cc-conf', {
-    searchPlaces: [
-      '.cc-conf.yaml',
-      '.cc-conf.yml',
-      '.cc-conf.json',
-      '.cc-confrc',
-      'package.json',
-    ],
+    searchPlaces: ['.cc-conf.yaml', '.cc-conf.yml', '.cc-conf.json', '.cc-confrc', 'package.json'],
   });
 
   const result = await explorer.search();
