@@ -8,10 +8,7 @@ import { cacheCommand } from './cli/cache.js';
 
 const program = new Command();
 
-program
-  .name('cc-conf')
-  .description('Claude Code Config - backup/restore tool')
-  .version('0.1.0');
+program.name('cc-conf').description('Claude Code Config - backup/restore tool').version('0.1.0');
 
 // Global language option
 program.option('-l, --lang <lang>', 'Language (en/zh)', 'en');
