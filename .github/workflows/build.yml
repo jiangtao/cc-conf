@@ -68,7 +68,7 @@ jobs:
 
       - name: Package binaries with pkg
         run: |
-          pnpm pkg dist/bundle.cjs -t node18-linux-x64,node18-linux-arm64,node18-macos-x64,node18-macos-arm64,node18-win-x64 --output bin/cc-conf
+          pnpm exec pkg dist/bundle.cjs -t node18-linux-x64,node18-linux-arm64,node18-macos-x64,node18-macos-arm64,node18-win-x64 --output bin/cc-conf
 
       - name: Rename binaries for upload
         run: |
